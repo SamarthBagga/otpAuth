@@ -6,19 +6,19 @@ import generateToken from "../utils/generateToken.js";
 //route POST /api/users/auth
 //@access Public
 const authUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { number } = req.body;
 
-  const user = await User.findOne({ email });
-  if(user && (await user.matchPassword(password))){
+  const user = await User.findOne({ number });
+  if(user){
     generateToken(res, user._id);
     res.status(201).json({
       _id:user._id,
       name:user.name,
-      email: user.email
+      number:user.number
     });
   }else{
     res.status(401);
-    throw new Error('Invalid email or password')
+    throw new Error('Invalid number')
   }
 
 });
@@ -27,9 +27,9 @@ const authUser = asyncHandler(async (req, res) => {
 //router Post /api/users
 //access Public 
 const registerUser = asyncHandler(async (req, res) => {
-  const {name, email, password} = req.body;
+  const {name, number} = req.body;
   
-  const userExists= await User.findOne({email});
+  const userExists= await User.findOne({number});
   if(userExists){
     res.status(400);
     throw new Error('User already exists');
@@ -37,15 +37,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const user = await User.create({
     name,
-    email,
-    password
+    number
   });
   if(user){
     generateToken(res, user._id);
     res.status(201).json({
       _id:user._id,
       name:user.name,
-      email: user.email
+      number:number.name
     });
   }else{
     res.status(400);
